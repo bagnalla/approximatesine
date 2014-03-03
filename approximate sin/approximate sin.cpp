@@ -1,3 +1,8 @@
+/*
+	This program demonstrates a function which 
+	approximates sine to ~15 decimal places
+	using its Maclaurin series.
+*/
 
 #include "stdafx.h"
 #include <iostream>
@@ -9,15 +14,12 @@
 
 using namespace std;
 
-double factorial(int n);
-
-double wrapAngle(double angle);
-
-bool parseDouble(string string, double& result);
-
-double sin(double theta, double& error);
-
 const double PI = atan(1.0)*4;
+const double TWOPI = PI * 2.0;
+
+double factorial(int n);
+double wrapAngle(double angle);
+double sin(double theta, double& error);
 
 int main()
 {
@@ -59,9 +61,10 @@ double factorial(int n)
 
 double wrapAngle(double angle)
 {
-	double twoPi = 2.0 * PI;
+	if (angle < 0)
+		angle = -angle + PI;
 
-    return angle - twoPi * floor( angle / twoPi );
+	return fmod(angle, TWOPI);
 }
 
 double sin(double theta, double& error)
@@ -79,56 +82,4 @@ double sin(double theta, double& error)
 	error = (pow(-1.0, n + 1) * pow(theta, 2*(n + 1) + 1)) / factorial(2*(n + 1) + 1);
 
 	return sin;
-}
-
-bool parseDouble(string string, double& result)
-{
-	bool dot = false;
-	double number = 0, power = 1;
-
-	char numLength = string.length();
-	char decimalPlace = numLength;
-	char neg = (string[0] == '-');
-
-	for (int i = neg; i < numLength; i++)
-	{
-		if (string[i] == '.')
-		{
-			decimalPlace = i;
-			if (!dot)
-				dot = true;
-			else
-				return false;
-		}
-	}
-
-	int decimalAmount = 0;
-
-	if (decimalPlace >= neg)
-		decimalAmount = numLength - (decimalPlace + 1);
-
-	for (int i = 0; i < decimalAmount; i++)
-		power /= 10;
-
-	for (int i = numLength - 1; i >= neg; i--)
-	{
-		if (string[i] == '.')
-			continue;
-
-		char num = string[i] - 48;
-
-		if (num < 0 || num > 9)
-			return false;
-
-		number += num * power;
-
-		power *= 10;
-	}
-
-	if (neg)
-		result = -number;
-	else
-		result = number;
-
-	return true;
 }
